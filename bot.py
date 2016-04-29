@@ -36,13 +36,13 @@ def echo(bot, update):
             TIME_TO_REPOST[update.message.chat_id] = random.randint(10, 50)
         else:
             TIME_TO_REPOST[update.message.chat_id] -= 1
-    elif username == "futurobot_tg":
-        bot.sendMessage(update.message.chat_id, text=update.message.to_dict())
-        if TIME_TO_REPOST.get(update.message.chat_id, 0) == 0:
-            bot.sendMessage(update.message.chat_id, text=fochi_replyes[random.randint(0, len(fochi_replyes) - 1)], reply_to_message_id=update.message.message_id)
-            TIME_TO_REPOST[update.message.chat_id] = random.randint(10, 50)
-        else:
-            TIME_TO_REPOST[update.message.chat_id] -= 1
+    # elif username == "futurobot_tg":
+    #     bot.sendMessage(update.message.chat_id, text=update.message.to_dict())
+    #     if TIME_TO_REPOST.get(update.message.chat_id, 0) == 0:
+    #         bot.sendMessage(update.message.chat_id, text=fochi_replyes[random.randint(0, len(fochi_replyes) - 1)], reply_to_message_id=update.message.message_id)
+    #         TIME_TO_REPOST[update.message.chat_id] = random.randint(10, 50)
+    #     else:
+    #         TIME_TO_REPOST[update.message.chat_id] -= 1
 
 
 def error(bot, update, error):
