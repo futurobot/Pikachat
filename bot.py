@@ -28,7 +28,7 @@ def help(bot, update):
 
 
 def echo(bot, update):
-    username = update.message.chat.username
+    username = update.message.from_user.username
     last_name = update.message.chat.last_name
     if username == "fochi_ip":
         if TIME_TO_REPOST.get(update.message.chat_id, 0) == 0:
