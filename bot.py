@@ -5,7 +5,7 @@ import logging
 import config
 import random
 import re
-from telegram.ext import Updater, CommandHandler, MessageHandler, filters
+from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
 
 # Enable logging
 logging.basicConfig(
@@ -55,7 +55,7 @@ def main():
     dp = updater.dispatcher
     dp.addHandler(CommandHandler("start", start))
     dp.addHandler(CommandHandler("help", help))
-    dp.addHandler(MessageHandler(filters.TEXT, echo))
+    dp.addHandler(MessageHandler(Filters.TEXT, echo))
     dp.addErrorHandler(error)
     updater.start_polling()
     updater.idle()
