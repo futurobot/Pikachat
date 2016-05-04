@@ -18,7 +18,8 @@ TIME_TO_REPOST = dict()
 fochi_replyes = ["Ко ко ко", "Воу воу, палехчи паринь", "Смотрите все! Fochi бушует!",
                  "Слушайте его, он херни не скажет", "Круто сказанул, ыыыыы"]
 
-boobs_channels = ['@superboobs', '@boobsChannel', '@boobsblog', '@BestTits']
+# boobs_channels = ['@superboobs', '@boobsChannel', '@boobsblog', '@BestTits']
+boobs_channels = ['@superboobs', '@BestTits', '@boobsblog']
 boobs_regexp = re.compile('(сис(ек|ьки|ечки|и|яндры))|(ти(тьки|течки|тюли|ти))')
 
 
@@ -36,7 +37,7 @@ def echo(bot, update):
     if boobs_regexp.match(update.message.text) is not None:
         bot.forwardMessage(chat_id=update.message.chat_id,
                            from_chat_id=boobs_channels[random.randint(0, len(boobs_channels) - 1)],
-                           message_id=random.randint(1, 2700))
+                           message_id=random.randint(1, 1000))
     elif update.message.from_user.username == "fochi_ip":
         if TIME_TO_REPOST.get(update.message.chat_id, 0) == 0:
             bot.sendMessage(update.message.chat_id, text=fochi_replyes[random.randint(0, len(fochi_replyes) - 1)],
@@ -55,7 +56,7 @@ def main():
     dp = updater.dispatcher
     dp.addHandler(CommandHandler("start", start))
     dp.addHandler(CommandHandler("help", help))
-    dp.addHandler(MessageHandler(Filters.TEXT, echo))
+    dp.addHandler(MessageHandler([Filters.text], echo))
     dp.addErrorHandler(error)
     updater.start_polling()
     updater.idle()
