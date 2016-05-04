@@ -20,7 +20,10 @@ fochi_replyes = ["Ко ко ко", "Воу воу, палехчи паринь",
 
 # boobs_channels = ['@superboobs', '@boobsChannel', '@boobsblog', '@BestTits']
 boobs_channels = ['@superboobs', '@BestTits', '@boobsblog']
-boobs_regexp = re.compile('(сис(ек|ьки|ечки|и|яндры))|(ти(тьки|течки|тюли|ти))')
+boobs_regexp = re.compile('(сис(ек|ьки|ечки|и|яндры))|(ти(тьки|течки|тюли|ти|тяндры))', re.IGNORECASE)
+
+ass_channels = ['@bigasianasses', '@BestAss']
+ass_regexp = re.compile('(поп(ка|ец))|(жоп(ка|ища|уля))', re.IGNORECASE)
 
 
 # Define a few command handlers. These usually take the two arguments bot and
@@ -37,6 +40,10 @@ def echo(bot, update):
     if boobs_regexp.match(update.message.text) is not None:
         bot.forwardMessage(chat_id=update.message.chat_id,
                            from_chat_id=boobs_channels[random.randint(0, len(boobs_channels) - 1)],
+                           message_id=random.randint(1, 1000))
+    if ass_regexp.match(update.message.text) is not None:
+        bot.forwardMessage(chat_id=update.message.chat_id,
+                           from_chat_id=ass_channels[random.randint(0, len(ass_channels) - 1)],
                            message_id=random.randint(1, 1000))
     elif update.message.from_user.username == "fochi_ip":
         if TIME_TO_REPOST.get(update.message.chat_id, 0) == 0:
