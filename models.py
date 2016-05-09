@@ -110,5 +110,5 @@ class Chat(DeclarativeBase):
     #     return _hash
 
     def __repr__(self):
-        return "User(id:'%s' username:'%s' first_name:'%s' last_name:'%s' type:'%s')" % (
-            self.id, self.username, self.first_name, self.last_name, self.type)
+        return "Chat(id:'%s' title:'%s'  username:'%s' first_name:'%s' last_name:'%s' type:'%s')" % (
+            self.id, self.title, self.username, self.first_name, self.last_name, self.type)

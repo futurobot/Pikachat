@@ -153,7 +153,8 @@ class Bot(object):
 
             session.commit()
             return chat, user
-        except:
+        except Exception as e:
+            print(str(e))
             session.rollback()
         finally:
             session.close()
