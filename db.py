@@ -13,7 +13,7 @@ class sql_database(object):
             self.engine = create_engine(config.SQLALCHEMY_CONNECTION_STRING, echo=config.DEBUG)
             self.DBSession = sessionmaker(bind=self.engine)
         except Exception as e:
-            print(e.message)
+            print(str(e))
             self.engine = None
 
     def get_engine(self):
