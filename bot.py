@@ -64,7 +64,7 @@ class Bot(object):
                         if counter > 0:
                             response += '\n'
                         response += "%s. %s(%s) Рейтинг: %s Группы: %s" % (
-                            counter, user.username, user.id, user.rating,
+                            counter + 1, user.username, user.id, user.rating,
                             ','.join(['%s' % chat.id for chat in user.participate_in_chats]))
                         counter += 1
                     bot.sendMessage(update.message.chat_id,
@@ -81,8 +81,17 @@ class Bot(object):
                     bot.sendMessage(update.message.chat_id,
                                     text='Пока что нет групп в базе.')
                 else:
+                    response = ''
+                    counter = 0
+                    for group in groups:
+                        if counter > 0:
+                            response += '\n'
+                        response += "%s. %s(%s) Участники: %s" % (
+                            counter + 1, group.title, group.id,
+                            ','.join(['%s' % user.id for user in group.users_in_chat]))
+                        counter += 1
                     bot.sendMessage(update.message.chat_id,
-                                    text='\n'.join(map(str, groups)))
+                                    text=response)
             finally:
                 session.close()
 
