@@ -1,14 +1,13 @@
 # -*- coding: utf-8 -*-
 # Pikabu chat bot
 import logging
-import random
-import re
-
-from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
 
 import config
 import db
 import models
+import random
+import re
+from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
 
 
 class Bot(object):
@@ -34,12 +33,12 @@ class Bot(object):
         # init main logic
         self.bot_db = db.sql_database()
         models.create_tables(self.bot_db.get_engine())
-        self.session = self.bot_db.get_session()
 
         self.updater = Updater(config.TOKEN)
         self.dp = self.updater.dispatcher
         self.dp.addHandler(CommandHandler("start", self.start))
         self.dp.addHandler(CommandHandler("users", self.users))
+        self.dp.addHandler(CommandHandler("groups", self.groups))
         self.dp.addHandler(CommandHandler("help", self.help))
         self.dp.addHandler(MessageHandler([Filters.text], self.echo))
         self.dp.addErrorHandler(self.error)
@@ -53,19 +52,49 @@ class Bot(object):
     def users(self, bot, update):
         if update.message.from_user.id == config.ADMIN_ID:
             session = self.bot_db.get_session()
-            users = session.query(models.User).limit(20).all()
-            if users is None:
-                bot.sendMessage(update.message.chat_id,
-                                text='Пока что нет пользователей в базе.')
-            else:
-                bot.sendMessage(update.message.chat_id,
-                                text='\n'.join(map(str, users)))
+            try:
+                users = session.query(models.User).limit(20)
+                if users is None:
+                    bot.sendMessage(update.message.chat_id,
+                                    text='Пока что нет пользователей в базе.')
+                else:
+                    response = ''
+                    counter = 0
+                    for user in users:
+                        if counter > 0:
+                            response += '\n'
+                        response += "%s. %s(%s) Рейтинг: %s Группы: %s" % (
+                            counter, user.username, user.id, user.rating,
+                            ','.join(['%s' % chat.id for chat in user.participate_in_chats]))
+                        counter += 1
+                    bot.sendMessage(update.message.chat_id,
+                                    text=response)
+            finally:
+                session.close()
+
+    def groups(self, bot, update):
+        if update.message.from_user.id == config.ADMIN_ID:
+            session = self.bot_db.get_session()
+            try:
+                groups = session.query(models.Chat).limit(20).all()
+                if len(groups) == 0:
+                    bot.sendMessage(update.message.chat_id,
+                                    text='Пока что нет групп в базе.')
+                else:
+                    bot.sendMessage(update.message.chat_id,
+                                    text='\n'.join(map(str, groups)))
+            finally:
+                session.close()
 
     def help(self, bot, update):
         bot.sendMessage(update.message.chat_id, text='Help!')
 
     def echo(self, bot, update):
-        user = self.__put_user_to_database(update)
+        chat, user = self._put_message_to_database(update)
+
+        if user is not None:
+            # handle possible rating stuff
+            pass
 
         if self.boobs_regexp.match(update.message.text) is not None:
             bot.forwardMessage(chat_id=update.message.chat_id,
@@ -87,14 +116,47 @@ class Bot(object):
     def error(self, bot, update, error):
         self.logger.warn('Ошибочка "%s"' % (error))
 
-    def __put_user_to_database(self, update):
-        user = models.User(update.message.from_user.id, update.message.from_user.username,
-                           update.message.from_user.first_name, update.message.from_user.last_name,
-                           update.message.from_user.type)
-        self.session.merge(user)
-        self.session.commit()
+    def _put_message_to_database(self, update):
+        session = self.bot_db.get_session()
+        try:
+            chat = session.query(models.Chat).filter_by(id=update.message.chat_id).first()
+            if chat is None:
+                chat = models.Chat(update.message.chat.id, update.message.chat.type, update.message.chat.title,
+                                   update.message.chat.first_name, update.message.chat.last_name,
+                                   update.message.chat.username)
+                session.add(chat)
+            else:
+                chat.id = update.message.chat.id
+                chat.type = update.message.chat.type
+                chat.title = update.message.chat.title
+                chat.first_name = update.message.chat.first_name
+                chat.last_name = update.message.chat.last_name
+                chat.username = update.message.chat.username
+                session.merge(chat)
 
-        return user
+            user = session.query(models.User).filter_by(id=update.message.from_user.id).first()
+            if user is None:
+                user = models.User(update.message.from_user.id, update.message.from_user.username,
+                                   update.message.from_user.first_name, update.message.from_user.last_name,
+                                   update.message.from_user.type)
+                session.add(user)
+            else:
+                user.id = update.message.from_user.id
+                user.username = update.message.from_user.username
+                user.first_name = update.message.from_user.first_name
+                user.last_name = update.message.from_user.last_name
+                user.type = update.message.from_user.type
+                session.merge(user)
+
+            user.participate_in_chats.append(chat)
+            chat.users_in_chat.append(user)
+
+            session.commit()
+            return chat, user
+        except:
+            session.rollback()
+        finally:
+            session.close()
 
 
 def main():
