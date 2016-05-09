@@ -157,8 +157,10 @@ class Bot(object):
                 user.type = update.message.from_user.type
                 session.merge(user)
 
-            user.participate_in_chats.append(chat)
-            chat.users_in_chat.append(user)
+            if chat not in user.participate_in_chats:
+                user.participate_in_chats.append(chat)
+            if user not in chat.users_in_chat:
+                chat.users_in_chat.append(user)
 
             session.commit()
             return chat, user
