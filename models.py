@@ -20,7 +20,7 @@ Example of message in group
 #  'new_chat_photo': [], 'migrate_to_chat_id': 0}
 """
 
-from sqlalchemy import Integer, String, Column, Table, ForeignKey
+from sqlalchemy import Integer, BigInteger, String, Column, Table, ForeignKey
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
 
@@ -37,8 +37,8 @@ def create_tables(engine):
 
 
 association_table = Table('user_to_chat_association', DeclarativeBase.metadata,
-                          Column('user', Integer, ForeignKey('users.id')),
-                          Column('chat', Integer, ForeignKey('chats.id'))
+                          Column('user', BigInteger, ForeignKey('users.id')),
+                          Column('chat', BigInteger, ForeignKey('chats.id'))
                           )
 
 
@@ -47,7 +47,7 @@ class User(DeclarativeBase):
     Class that represent telegram user
     """
     __tablename__ = 'users'
-    id = Column(Integer, primary_key=True)
+    id = Column(BigInteger, primary_key=True)
     username = Column(String(40))
     first_name = Column(String(40))
     last_name = Column(String(40))
@@ -82,7 +82,7 @@ class Chat(DeclarativeBase):
     Class that represent telegram chat
     """
     __tablename__ = 'chats'
-    id = Column(Integer, primary_key=True)
+    id = Column(BigInteger, primary_key=True)
     title = Column(String(40))
     username = Column(String(40))
     type = Column(String(40))

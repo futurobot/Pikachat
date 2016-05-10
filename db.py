@@ -11,7 +11,7 @@ class sql_database(object):
     def __init__(self):
         try:
             self.engine = create_engine(config.SQLALCHEMY_CONNECTION_STRING, client_encoding='utf8',  echo=config.DEBUG)
-            self.DBSession = sessionmaker(bind=self.engine)
+            self.DBSession = sessionmaker(bind=self.engine, autoflush=False)
         except Exception as e:
             print(str(e))
             self.engine = None
